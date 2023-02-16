@@ -20,18 +20,8 @@ public class AccountTriggerHandler {
                }
         }
     }
-    
-    public static void updateDescription(List<Account> accts, Map<Id, Account> oldAccount){
-        
-        
-        // map acc Id to price for old valuces
-        // 
-		Set<Id> accIds = new Set<Id>();
-        for(Account a : accts){
-            accIds.add(a.Id);
-        }
-        List<Account> acctList = [SELECT Id, Description,Name,product_count__c FROM Account WHERE Id =: accIds];
-        Map<String, Account> sObjectMap = new Map<String, Account>(acctList);
+      public static void updateDescription(List<Account> accts, Map<Id, Account> oldAccount){
+        Map<String, Account> sObjectMap = new Map<String, Account>(accts);
         Map<String, Object> acctMapValue;
         Map<String, Object> descMapValue;
         Map<String, Object> detailsMap;
@@ -87,6 +77,7 @@ public class AccountTriggerHandler {
             }
         }
 
+          System.debug('oldFinalString================ ' + oldAcctMapValue);
 		// New Account values
         for(Account acct : sObjectMap.values()){
             acctMapValue = (Map<String, Object>)JSOn.deserializeUntyped((String)(acct.get('Description')));
@@ -102,7 +93,7 @@ public class AccountTriggerHandler {
             if(descMapValue.containsKey('details') && descMapValue.get('brand') == 'iphone'){
                 detailsMap = (Map<String, Object>)descMapValue.get('details');
                 if(detailsMap.containskey('count')){
-                    detailsMap.put('count',acctList[0].product_count__c );
+                    detailsMap.put('count',accts[0].product_count__c );
                 }
                 if(detailsMap.containskey('price') && (detailsMap.get('price') != null)){
                      Integer productCount = Integer.valueOf(detailsMap.get('count'));
@@ -121,7 +112,7 @@ public class AccountTriggerHandler {
                 if(moreDetailsMap.containsKey('price') && moreDetailsMap.get('brand') == 'samsung'){
                     priceMap = (Map<String, Object>)moreDetailsMap.get('price');
                     if(priceMap.containskey('count')){
-                        priceMap.put('count',acctList[0].product_count__c );
+                        priceMap.put('count',accts[0].product_count__c );
                     }
                     if(priceMap.containskey('price') && (priceMap.get('price') != null ) ){
                         Integer productCount = Integer.valueOf(priceMap.get('count'));
@@ -136,14 +127,13 @@ public class AccountTriggerHandler {
             }
         }
         
-        
         finalString = JSON.serialize(acctMapValue);
+        System.debug('finalString============' + acctMapValue);
         List<Account> updatedlist = new List<Account>();
-        for(Account acct : acctList){
+        for(Account acct : accts){
             acct.Description = finalString;
             updatedlist.add(acct);
         }
         isdisabletrigger = true;
-        UPDATE updatedlist;        
     }
 }

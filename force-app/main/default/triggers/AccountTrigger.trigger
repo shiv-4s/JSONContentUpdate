@@ -1,4 +1,4 @@
-trigger AccountTrigger on Account (After update) {
+trigger AccountTrigger on Account (Before update) {
     
      Map<Id, Account> oldAccountMap = Trigger.oldMap;
      Map<Id, Account> newAccountMap = Trigger.newMap;
@@ -9,7 +9,7 @@ trigger AccountTrigger on Account (After update) {
         
         if (oldAccount.product_count__c != newAccount.product_count__c) {
                 if(!AccountTriggerHandler.isdisabletrigger){
-                    AccountTriggerHandler.updateDescription(Trigger.Old, oldAccountMap);
+                    AccountTriggerHandler.updateDescription(Trigger.New, oldAccountMap);
          }
     
         }
